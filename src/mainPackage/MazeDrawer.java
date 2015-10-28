@@ -22,8 +22,8 @@ import userPackage.SmartJerry;
 
 public class MazeDrawer extends JPanel implements ComponentListener, KeyListener {
 
-	final int ROWS = 10;
-	final int COLUMNS = 10;
+	final int ROWS = 30;
+	final int COLUMNS = 30;
 
 	final int NUMBER_OF_CHEESES = 10;
 
