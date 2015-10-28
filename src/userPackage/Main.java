@@ -3,6 +3,8 @@ package userPackage;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -29,6 +31,12 @@ public class Main {
 		myFrame.addComponentListener(myPanel);
 		myFrame.addKeyListener(myPanel);
 		
+		try {
+			myPanel.mazeWorld.readJSON();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 //		IntersectPanel myPanel = new IntersectPanel();
 //		JFrame myFrame = new JFrame("TJ Maze");

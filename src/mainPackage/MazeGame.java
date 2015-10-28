@@ -1,8 +1,13 @@
 package mainPackage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 
 import javax.swing.SwingWorker;
@@ -10,6 +15,10 @@ import javax.swing.SwingWorker;
 import mainPackage.GridCell.visibleObject;
 import userPackage.NotSmartJerry;
 import userPackage.SmartJerry;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 public class MazeGame {
 	
@@ -57,11 +66,11 @@ public class MazeGame {
 	Jerry jerry;
 	Tom tom;
 	
+	private ArrayList<Wall> worldWalls;
 	
 	public MazeGame() {
 			
 	}
-	
 	
 	public void createRandomMaze(int rows, int columns, Difficulty level){
 		
@@ -84,7 +93,7 @@ public class MazeGame {
 			}
 		}
 		
-		ArrayList<Wall> remainingWalls = new ArrayList<Wall>(tempWalls);
+		worldWalls = new ArrayList<Wall>(tempWalls);
 		
 		DisjointSet DJset = new DisjointSet(rows*columns);
 		
@@ -100,51 +109,96 @@ public class MazeGame {
 				worldGraph.addEdge(cell1Index/columns,cell1Index%columns,cell2Index/columns,cell2Index%columns);
 				
 				DJset.join(cell1Index, cell2Index);
-				remainingWalls.remove(wallIndex);
+				worldWalls.remove(wallIndex);
 			}
 			
 			tempWalls.remove(wallIndex);
 		}
 		
 		//Remove more walls
-		int numOfRemainingWalls = remainingWalls.size();
+		int numOfRemainingWalls = worldWalls.size();
 		Random rand = new Random();
 
 		if(level == Difficulty.FORBABY){
 			for(int i=numOfRemainingWalls ; i>(int)numOfRemainingWalls*0.05 ; i--){
-				int wallIndex = rand.nextInt(remainingWalls.size());
-				int cell1Index = remainingWalls.get(wallIndex).cell1Index;
-				int cell2Index = remainingWalls.get(wallIndex).cell2Index;
+				int wallIndex = rand.nextInt(worldWalls.size());
+				int cell1Index = worldWalls.get(wallIndex).cell1Index;
+				int cell2Index = worldWalls.get(wallIndex).cell2Index;
 				worldGraph.addEdge(cell1Index/columns,cell1Index%columns,cell2Index/columns,cell2Index%columns);
-				remainingWalls.remove(wallIndex);
+				worldWalls.remove(wallIndex);
 			}
 		}else if(level == Difficulty.EASY){
 			for(int i=numOfRemainingWalls ; i>(int)numOfRemainingWalls*0.5 ; i--){
-				int wallIndex = rand.nextInt(remainingWalls.size());
-				int cell1Index = remainingWalls.get(wallIndex).cell1Index;
-				int cell2Index = remainingWalls.get(wallIndex).cell2Index;
+				int wallIndex = rand.nextInt(worldWalls.size());
+				int cell1Index = worldWalls.get(wallIndex).cell1Index;
+				int cell2Index = worldWalls.get(wallIndex).cell2Index;
 				worldGraph.addEdge(cell1Index/columns,cell1Index%columns,cell2Index/columns,cell2Index%columns);
-				remainingWalls.remove(wallIndex);
+				worldWalls.remove(wallIndex);
 			}
 		}else if(level == Difficulty.NORMAL){
 			for(int i=numOfRemainingWalls ; i>(int)numOfRemainingWalls*0.7 ; i--){
-				int wallIndex = rand.nextInt(remainingWalls.size());
-				int cell1Index = remainingWalls.get(wallIndex).cell1Index;
-				int cell2Index = remainingWalls.get(wallIndex).cell2Index;
+				int wallIndex = rand.nextInt(worldWalls.size());
+				int cell1Index = worldWalls.get(wallIndex).cell1Index;
+				int cell2Index = worldWalls.get(wallIndex).cell2Index;
 				worldGraph.addEdge(cell1Index/columns,cell1Index%columns,cell2Index/columns,cell2Index%columns);
-				remainingWalls.remove(wallIndex);
+				worldWalls.remove(wallIndex);
 			}
 		}else if(level == Difficulty.HARD){
 			for(int i=numOfRemainingWalls ; i>(int)numOfRemainingWalls*0.9 ; i--){
-				int wallIndex = rand.nextInt(remainingWalls.size());
-				int cell1Index = remainingWalls.get(wallIndex).cell1Index;
-				int cell2Index = remainingWalls.get(wallIndex).cell2Index;
+				int wallIndex = rand.nextInt(worldWalls.size());
+				int cell1Index = worldWalls.get(wallIndex).cell1Index;
+				int cell2Index = worldWalls.get(wallIndex).cell2Index;
 				worldGraph.addEdge(cell1Index/columns,cell1Index%columns,cell2Index/columns,cell2Index%columns);
-				remainingWalls.remove(wallIndex);
+				worldWalls.remove(wallIndex);
 			}
 		}
 	}
 	
+	public void writeJSON() throws FileNotFoundException, UnsupportedEncodingException{
+		
+		JSONArray wallList = new JSONArray();
+		
+		for(Wall w : worldWalls){
+			JSONObject obj = new JSONObject();
+			obj.put("cell1Index", w.cell1Index);
+			obj.put("cell2Index", w.cell2Index);
+			obj.put("Position", w.position.toString());
+			
+			wallList.add(obj);
+		}
+		
+		PrintWriter writer = new PrintWriter("WorldJSON.txt", "UTF-8");
+		writer.print(wallList);
+		writer.close();
+	}
+	
+	public void readJSON() throws FileNotFoundException{
+		String s = new Scanner(new File("WorldJSON.txt")).next();
+		
+		Object obj = JSONValue.parse(s);
+		JSONArray wallList = (JSONArray)obj;
+		ArrayList<Wall> tempWall = new ArrayList<>();
+		
+		for(Object j : wallList){
+			JSONObject js = (JSONObject)j;
+			int c1 = Integer.parseInt(js.get("cell1Index").toString());
+			int c2 = Integer.parseInt(js.get("cell2Index").toString());
+			String pos = js.get("Position").toString();
+			
+			Wall w;
+			
+			if(pos.equals("RIGHT")){
+				w = new Wall(c1, c2, Wall.Position.RIGHT);
+			}
+			else{
+				w = new Wall(c1, c2, Wall.Position.BOTTOM);
+			}
+			
+			tempWall.add(w);
+		}
+		
+		worldWalls = new ArrayList<Wall>(tempWall);
+	}
 	
 	public void generateRandomCheese(int numberOfCheeses, int rows, int columns){
 		
@@ -215,8 +269,7 @@ public class MazeGame {
 		}
 	}
 	
-	
-	
+
 	/// need to modify
 	public void removeCheesePerceptionDegree(Cheese cheese){
 		

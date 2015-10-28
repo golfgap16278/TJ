@@ -9,7 +9,7 @@ import mainPackage.MazeGame.MyWorker;
 
 public abstract class Jerry implements Movable {
 	
-	final int visionRange = 3;
+	final int visionRange = 1;
 	
 	protected GridCell currentCell;
 	protected GridCell tempCell;

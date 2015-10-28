@@ -22,14 +22,14 @@ import userPackage.SmartJerry;
 
 public class MazeDrawer extends JPanel implements ComponentListener, KeyListener {
 
-	final int ROWS = 30;
-	final int COLUMNS = 30;
+	final int ROWS = 8;
+	final int COLUMNS = 8;
 
-	final int NUMBER_OF_CHEESES = 10;
+	final int NUMBER_OF_CHEESES = 3;
 
 	final int SLEEP_DURATION = 800; // millisecond
 
-	final Difficulty LEVEL = Difficulty.NORMAL;
+	final Difficulty LEVEL = Difficulty.UNSOLVABLE;
 
 	private int height = 720;
 	private int width = 1280;
@@ -42,7 +42,7 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 	private Timer timer;
 
-	MazeGame mazeWorld;
+	public MazeGame mazeWorld;
 
 	public MazeDrawer() {
 
@@ -64,8 +64,6 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 		//GraphicLoop();
 
 	}
-
-
 
 	public void paintComponent(Graphics g1) {
 
