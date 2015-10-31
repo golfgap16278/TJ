@@ -32,7 +32,8 @@ public class Main {
 		myFrame.addKeyListener(myPanel);
 		
 		try {
-			myPanel.mazeWorld.readJSON();
+			//myPanel.mazeWorld.writeJSON();
+			//myPanel.mazeWorld.readJSON();;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

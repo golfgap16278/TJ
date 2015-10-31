@@ -29,6 +29,26 @@ public class GridCell {
 		this.columnIndex = columnIndex;
 	}
 	
+	public GridCell(int rowIndex, int columnIndex, int lastRowIndex, int lastColumnIndex){
+		
+		this.rowIndex = rowIndex;
+		this.columnIndex = columnIndex;
+		this.hasNorthEdge = true;
+		this.hasEastEdge = true;
+		this.hasWestEdge = true;
+		this.hasSouthEdge = true;
+		
+		if(rowIndex == 0)
+			this.hasNorthEdge = false;
+		if(rowIndex == lastRowIndex)
+			this.hasSouthEdge = false;
+		if(columnIndex == 0)
+			this.hasWestEdge = false;
+		if(columnIndex == lastColumnIndex)
+			this.hasEastEdge = false;
+		
+	}
+	
 //	public boolean hasNorthEdge(){
 //		return hasNorthEdge;
 //	}

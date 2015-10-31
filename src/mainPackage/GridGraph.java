@@ -19,6 +19,16 @@ public class GridGraph {
 		cellArray[rowIndex][columnIndex] = new GridCell(rowIndex, columnIndex);
 		
 	}
+	
+	public void createCompleteGraph() {
+		
+		for(int i=0 ; i<cellArray.length ; i++){
+			for(int j=0 ; j<cellArray[0].length ; j++){	
+				cellArray[i][j] = new GridCell(i, j, cellArray.length-1, cellArray[0].length-1);
+			}
+		}
+		
+	}
 
 	public boolean hasNode(int rowIndex, int columnIndex) {
 
@@ -50,6 +60,31 @@ public class GridGraph {
 			
 			cellArray[row1][column1].hasEastEdge = true;
 			cellArray[row2][column2].hasWestEdge = true;
+			
+		}
+	}
+	
+	public void removeEdge(int row1, int column1, int row2, int column2) {
+
+		if (row1 - 1 == row2 & column1 == column2) {
+			
+			cellArray[row1][column1].hasNorthEdge = false;
+			cellArray[row2][column2].hasSouthEdge = false;
+			
+		} else if (row1 + 1 == row2 & column1 == column2) {
+			
+			cellArray[row1][column1].hasSouthEdge = false;
+			cellArray[row2][column2].hasNorthEdge = false;
+			
+		} else if (row1 == row2 & column1 - 1 == column2) {
+			
+			cellArray[row1][column1].hasWestEdge = false;
+			cellArray[row2][column2].hasEastEdge = false;
+			
+		} else if (row1 == row2 & column1 + 1 == column2) {
+			
+			cellArray[row1][column1].hasEastEdge = false;
+			cellArray[row2][column2].hasWestEdge = false;
 			
 		}
 	}

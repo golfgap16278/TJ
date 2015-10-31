@@ -11,6 +11,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.Visibility;
+import java.io.FileNotFoundException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,10 +23,10 @@ import userPackage.SmartJerry;
 
 public class MazeDrawer extends JPanel implements ComponentListener, KeyListener {
 
-	final int ROWS = 8;
-	final int COLUMNS = 8;
+	int rows = 9;
+	int columns = 16;
 
-	final int NUMBER_OF_CHEESES = 3;
+	int numberOfCheese = 0;
 
 	final int SLEEP_DURATION = 800; // millisecond
 
@@ -53,9 +54,9 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 		// maze configuration
 		mazeWorld = new MazeGame();
-		mazeWorld.createRandomMaze(ROWS, COLUMNS, LEVEL);
-		mazeWorld.generateRandomCheese(NUMBER_OF_CHEESES, ROWS, COLUMNS);
-		mazeWorld.createJerry(ROWS / 2, COLUMNS / 2, new SmartJerry());
+		mazeWorld.createRandomMaze(rows, columns, LEVEL);
+		mazeWorld.generateRandomCheese(numberOfCheese, rows, columns);
+		mazeWorld.createJerry(rows / 2, columns / 2, new SmartJerry());
 		mazeWorld.sleepDuration = this.SLEEP_DURATION;
 
 		MazeGame.MyWorker mazeWorker = mazeWorld.new MyWorker();
@@ -67,7 +68,8 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 	public void paintComponent(Graphics g1) {
 
-		// System.out.println("WTF");
+		rows = mazeWorld.worldGraph.cellArray.length;
+		columns = mazeWorld.worldGraph.cellArray[0].length;
 
 		super.paintComponent(g1);
 		Graphics2D g = (Graphics2D) g1;
@@ -80,7 +82,7 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 		//drawCheesePerceptionDegree(g);
 
-		drawVisibility(g, mazeWorld.jerry);
+		//drawVisibility(g, mazeWorld.jerry);
 		
 		//drawIntersectedLine(g, mazeWorld.jerry);
 
@@ -89,8 +91,8 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 		GridCell[][] cellArray = mazeWorld.worldGraph.cellArray;
 
-		for (int i = 0; i < ROWS; i++) {
-			for (int j = 0; j < COLUMNS; j++) {
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
 
 				if (!cellArray[i][j].hasEastEdge)
 					drawRightWall(g, cellArray[i][j].rowIndex, cellArray[i][j].columnIndex);
@@ -113,7 +115,6 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 		g.setStroke(new BasicStroke(3));
 
-		// DrawGraph(g);
 
 		g.setStroke(new BasicStroke(1));
 		g.setColor(new Color(255, 193, 7));
@@ -148,7 +149,7 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 	private void drawBorder(Graphics2D g) {
 
-		g.drawRect(startX, startY, lineWidth * COLUMNS, lineHeight * ROWS);
+		g.drawRect(startX, startY, lineWidth * columns, lineHeight * rows);
 
 	}
 
@@ -314,8 +315,8 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 		GridCell[][] cellArray = mazeWorld.worldGraph.cellArray;
 		GridCell cell = jerry.currentCell;
 
-		for (int i = 0; i < ROWS; i++) {
-			for (int j = 0; j < COLUMNS; j++) {
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
 
 //				if (!cellArray[i][j].hasEastEdge)
 //					drawRightWall(g, cellArray[i][j].rowIndex, cellArray[i][j].columnIndex);
@@ -414,8 +415,8 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 		int visionRange = jerry.visionRange;
 		visibleObject tempVisibility[][] = jerry.getVisibility();
 		
-		for(int r=0 ; r<ROWS ; r++){
-			for(int c=0 ; c<COLUMNS ; c++){
+		for(int r=0 ; r<rows ; r++){
+			for(int c=0 ; c<columns ; c++){
 				if((r < jerry.currentCell.rowIndex-visionRange | r > jerry.currentCell.rowIndex+visionRange) | (c < jerry.currentCell.columnIndex-visionRange | c > jerry.currentCell.columnIndex+visionRange)){
 					g.setColor(Color.DARK_GRAY);
 					g.fillRect(startX + (c) * lineWidth,
@@ -485,8 +486,8 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 	private void drawCheesePerceptionDegree(Graphics2D g) {
 
-		for (int i = 0; i < ROWS; i++) {
-			for (int j = 0; j < COLUMNS; j++) {
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
 
 				int degree = (int) mazeWorld.worldGraph.cellArray[i][j].cheesePerceptionDegree;
 
@@ -515,8 +516,8 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 	private void calculateHeightAndWidth() {
 
-		lineHeight = height / ROWS;
-		lineWidth = width / COLUMNS;
+		lineHeight = height / rows;
+		lineWidth = width / columns;
 
 		if (lineHeight > lineWidth) {
 			lineHeight = lineWidth;
@@ -528,8 +529,8 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 
 	private void calculateStartingPoint() {
 
-		int verticalGap = height - lineHeight * ROWS;
-		int horizontalGap = width - lineWidth * COLUMNS;
+		int verticalGap = height - lineHeight * rows;
+		int horizontalGap = width - lineWidth * columns;
 
 		startX = horizontalGap / 2;
 		startY = verticalGap / 2;
@@ -635,11 +636,23 @@ public class MazeDrawer extends JPanel implements ComponentListener, KeyListener
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 
 			mazeWorld = new MazeGame();
-			mazeWorld.createRandomMaze(ROWS, COLUMNS, LEVEL);
-			mazeWorld.generateRandomCheese(NUMBER_OF_CHEESES, ROWS, COLUMNS);
-			mazeWorld.createJerry(ROWS / 2, COLUMNS / 2, new SmartJerry());
+			mazeWorld.createRandomMaze(rows, columns, LEVEL);
+			mazeWorld.generateRandomCheese(numberOfCheese, rows, columns);
+			mazeWorld.createJerry(rows / 2, columns / 2, new SmartJerry());
+			this.repaint();
+			
+		}else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+
+			try {
+				mazeWorld.readJSON();
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			this.repaint();
 		}
+		
+		
 
 	}
 
